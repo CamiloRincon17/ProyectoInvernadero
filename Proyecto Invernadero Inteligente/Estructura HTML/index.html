@@ -1,0 +1,589 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invernadero Inteligente</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --green-primary: #22c55e;
+            --green-secondary: #16a34a;
+            --green-light: #f0fdf4;
+            --green-bg: #ecfdf5;
+        }
+        
+        body {
+            background-color: var(--green-bg);
+            padding-bottom: 70px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar-custom {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .sensor-card {
+            border-left-width: 4px !important;
+            border-radius: 12px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        .sensor-card.alert {
+            border-left-color: #ef4444 !important;
+        }
+        
+        .sensor-card.normal {
+            border-left-color: var(--green-primary) !important;
+        }
+        
+        .alert-item {
+            border-left-width: 4px !important;
+            border-radius: 8px !important;
+        }
+        
+        .alert-unread {
+            border-left-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+        
+        .alert-read {
+            background-color: #f9fafb !important;
+        }
+        
+        .nav-bottom {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .nav-item.active {
+            color: var(--green-primary) !important;
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6b7280;
+        }
+        
+        .modal-content {
+            border-radius: 16px !important;
+        }
+        
+        .badge-alert {
+            position: absolute;
+            top: 8px;
+            right: 60px;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #d1d5db;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--green-primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="gradient-bg min-vh-100 d-flex align-items-center">
+        <div class="login-container">
+            <div class="text-center mb-4">
+                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+                    <i class="bi bi-lightning text-white" style="font-size: 24px;"></i>
+                </div>
+                <h1 class="h3 fw-bold text-dark mb-2">Invernadero Inteligente</h1>
+                <p class="text-muted">Monitoreo y control de tu invernadero</p>
+            </div>
+
+            <form id="loginForm" class="bg-white rounded-3 p-4 shadow-sm">
+                <div class="mb-3">
+                    <label class="form-label fw-medium text-dark">Correo Electrónico</label>
+                    <input type="email" class="form-control form-control-lg" id="email" placeholder="tu@email.com" required>
+                </div>
+                
+                <div class="mb-4 position-relative">
+                    <label class="form-label fw-medium text-dark">Contraseña</label>
+                    <input type="password" class="form-control form-control-lg pe-5" id="password" placeholder="••••••••" required>
+                    <i class="bi bi-eye password-toggle" id="togglePassword"></i>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg w-100 fw-semibold">Iniciar Sesión</button>
+            </form>
+
+            <div class="text-center mt-4">
+                <p class="text-muted small">
+                    ¿No tienes cuenta? <a href="#" class="text-success fw-medium">Regístrate</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden initially) -->
+    <div id="mainApp" class="d-none">
+        <!-- Header -->
+        <header class="navbar-custom">
+            <div class="container">
+                <div class="d-flex align-items-center justify-content-between py-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-lightning text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="h5 fw-bold text-dark mb-0">Invernadero</h1>
+                            <p class="text-muted small mb-0">Monitoreo Activo</p>
+                        </div>
+                    </div>
+                    <button class="btn p-2" id="logoutBtn">
+                        <i class="bi bi-person-circle text-muted" style="font-size: 20px;"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mt-4">
+            <!-- Home Tab -->
+            <div id="homeTab" class="tab-content active">
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="card sensor-card alert">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-thermometer text-danger"></i>
+                                    <h6 class="card-title mb-0 fw-semibold">Temperatura</h6>
+                                </div>
+                                <p class="display-6 fw-bold mb-1">28°C</p>
+                                <div class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-exclamation-triangle text-danger"></i>
+                                    <small class="text-danger">Alta temperatura</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card sensor-card normal">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-droplet text-primary"></i>
+                                    <h6 class="card-title mb-0 fw-semibold">Humedad</h6>
+                                </div>
+                                <p class="display-6 fw-bold mb-1">65%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card sensor-card normal">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-sun text-warning"></i>
+                                    <h6 class="card-title mb-0 fw-semibold">Luz</h6>
+                                </div>
+                                <p class="display-6 fw-bold mb-1">75%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card sensor-card normal">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-lightning text-success"></i>
+                                    <h6 class="card-title mb-0 fw-semibold">Riego</h6>
+                                </div>
+                                <p class="display-6 fw-bold mb-1">40%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="card-title fw-semibold mb-0">Alertas Recientes</h5>
+                            <i class="bi bi-bell text-danger"></i>
+                        </div>
+                        
+                        <div class="alert-item alert-unread mb-3">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="bi bi-thermometer text-danger"></i>
+                                        <span class="fw-medium">Temperatura alta: 32°C</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <i class="bi bi-clock"></i>
+                                        <span>10:30 AM</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 ms-2">
+                                    <button class="btn btn-sm p-1" title="Marcar como leída">
+                                        <i class="bi bi-eye text-muted"></i>
+                                    </button>
+                                    <button class="btn btn-sm p-1" title="Eliminar">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-item alert-read mb-3">
+                            <div class="d-flex align-items-start justify-content-between">
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <i class="bi bi-droplet text-primary"></i>
+                                        <span class="fw-medium">Humedad baja: 25%</span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 text-muted small">
+                                        <i class="bi bi-clock"></i>
+                                        <span>9:15 AM</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 ms-2">
+                                    <button class="btn btn-sm p-1" title="Eliminar">
+                                        <i class="bi bi-trash text-danger"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Tab -->
+            <div id="statsTab" class="tab-content d-none">
+                <h2 class="h4 fw-bold text-dark mb-4">Estadísticas</h2>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">Resumen Diario</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Temperatura Promedio</span>
+                                    <span class="fw-semibold">26.5°C</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Humedad Promedio</span>
+                                    <span class="fw-semibold">68%</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Horas de Luz</span>
+                                    <span class="fw-semibold">12h</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Riego Total</span>
+                                    <span class="fw-semibold">45L</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">Sensores Activos</h5>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item d-flex justify-content-between align-items-center bg-success bg-opacity-10 rounded mb-2">
+                                <span class="fw-medium">Sensor Temperatura 1</span>
+                                <span class="text-success">Activo</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center bg-success bg-opacity-10 rounded mb-2">
+                                <span class="fw-medium">Sensor Humedad 1</span>
+                                <span class="text-success">Activo</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center bg-success bg-opacity-10 rounded">
+                                <span class="fw-medium">Sensor Luz 1</span>
+                                <span class="text-success">Activo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts Tab -->
+            <div id="alertsTab" class="tab-content d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="h4 fw-bold text-dark">Alertas</h2>
+                    <button class="btn btn-success rounded-circle" data-bs-toggle="modal" data-bs-target="#addSensorModal">
+                        <i class="bi bi-plus"></i>
+                    </button>
+                </div>
+
+                <div class="alert-item alert-unread mb-3">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-thermometer text-danger"></i>
+                                <span class="fw-medium">Temperatura alta: 32°C</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 text-muted small">
+                                <i class="bi bi-clock"></i>
+                                <span>10:30 AM</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 ms-2">
+                            <button class="btn btn-sm p-1" title="Marcar como leída">
+                                <i class="bi bi-eye text-muted"></i>
+                            </button>
+                            <button class="btn btn-sm p-1" title="Eliminar">
+                                <i class="bi bi-trash text-danger"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert-item alert-read mb-3">
+                    <div class="d-flex align-items-start justify-content-between">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-droplet text-primary"></i>
+                                <span class="fw-medium">Humedad baja: 25%</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 text-muted small">
+                                <i class="bi bi-clock"></i>
+                                <span>9:15 AM</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 ms-2">
+                            <button class="btn btn-sm p-1" title="Eliminar">
+                                <i class="bi bi-trash text-danger"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settingsTab" class="tab-content d-none">
+                <h2 class="h4 fw-bold text-dark mb-4">Ajustes</h2>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">Configuración de Alertas</h5>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Notificaciones Push</span>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Email Alertas</span>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">Sensores</h5>
+                        <button class="btn btn-outline-success w-100" data-bs-toggle="modal" data-bs-target="#addSensorModal">
+                            + Agregar Nuevo Sensor
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title fw-semibold mb-3">Cuenta</h5>
+                        <button id="logoutBtn2" class="btn btn-outline-danger w-100">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="nav-bottom">
+            <div class="d-flex justify-content-around align-items-center py-2">
+                <button class="nav-item text-center p-2 active" data-tab="home">
+                    <i class="bi bi-house nav-icon"></i>
+                    <div class="small">Inicio</div>
+                </button>
+                <button class="nav-item text-center p-2" data-tab="stats">
+                    <i class="bi bi-bar-chart nav-icon"></i>
+                    <div class="small">Estadísticas</div>
+                </button>
+                <button class="nav-item text-center p-2 position-relative" data-tab="alerts">
+                    <i class="bi bi-bell nav-icon"></i>
+                    <div class="small">Alertas</div>
+                    <span class="badge-alert"></span>
+                </button>
+                <button class="nav-item text-center p-2" data-tab="settings">
+                    <i class="bi bi-gear nav-icon"></i>
+                    <div class="small">Ajustes</div>
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Add Sensor Modal -->
+    <div class="modal fade" id="addSensorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar Sensor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Nombre del Sensor</label>
+                        <input type="text" class="form-control" placeholder="Ej: Temperatura Zona A">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Tipo de Sensor</label>
+                        <select class="form-select">
+                            <option>Temperatura</option>
+                            <option>Humedad</option>
+                            <option>Luz</option>
+                            <option>Riego</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-medium">Valor Inicial</label>
+                        <input type="number" class="form-control" placeholder="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            document.getElementById('loginScreen').classList.add('d-none');
+            document.getElementById('mainApp').classList.remove('d-none');
+        });
+
+        // Password toggle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.className = type === 'password' ? 'bi bi-eye password-toggle' : 'bi bi-eye-slash password-toggle';
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('mainApp').classList.add('d-none');
+            document.getElementById('loginScreen').classList.remove('d-none');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        document.getElementById('logoutBtn2').addEventListener('click', function() {
+            document.getElementById('mainApp').classList.add('d-none');
+            document.getElementById('loginScreen').classList.remove('d-none');
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        // Tab navigation
+        document.querySelectorAll('[data-tab]').forEach(button => {
+            button.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                
+                // Hide all tabs
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('d-none');
+                });
+                
+                // Show selected tab
+                document.getElementById(tab + 'Tab').classList.remove('d-none');
+                
+                // Update active state
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
