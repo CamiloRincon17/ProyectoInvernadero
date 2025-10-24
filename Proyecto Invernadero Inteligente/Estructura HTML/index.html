@@ -12,6 +12,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="../Estructura Css/styles.css" />
   </head>
   <body>
@@ -93,9 +94,21 @@
                 <p class="text-muted small mb-0">Monitoreo Activo</p>
               </div>
             </div>
-            <button class="btn p-2" id="profileBtn">
-              <i class="bi bi-person-circle text-muted" style="font-size: 24px;"></i>
-            </button>
+            <div class="dropdown">
+              <button class="btn p-2 dropdown-toggle" id="profileBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle text-muted" style="font-size: 24px;"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header">Mi Cuenta</h6></li>
+                <li><a class="dropdown-item" href="#" id="profileInfo">
+                  <i class="bi bi-person me-2"></i>Perfil
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="#" id="logoutBtn">
+                  <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                </a></li>
+              </ul>
+            </div>
           </div>
         </div>
       </header>
@@ -104,52 +117,112 @@
       <main class="container mt-4">
         <!-- Home Tab -->
         <div id="homeTab" class="tab-content active">
-          <div class="row g-3 mb-4">
+          <div class="row g-3 mb-4" id="sensorsContainer">
             <div class="col-6">
-              <div class="card sensor-card alert">
+              <div class="card sensor-card alert" data-sensor="temperature">
                 <div class="card-body">
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-thermometer text-danger"></i>
-                    <h6 class="card-title mb-0 fw-semibold">Temperatura</h6>
+                  <div class="sensor-header">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <div class="sensor-icon bg-danger">
+                        <i class="bi bi-thermometer text-white"></i>
+                      </div>
+                      <div class="sensor-info">
+                        <h6 class="card-title mb-0 fw-semibold">Temperatura</h6>
+                        <small class="text-muted">Sensor Principal</small>
+                      </div>
+                    </div>
+                    <div class="sensor-status">
+                      <span class="badge bg-danger">Alerta</span>
+                    </div>
                   </div>
-                  <p class="display-6 fw-bold mb-1">28°C</p>
-                  <div class="d-flex align-items-center gap-1">
-                    <i class="bi bi-exclamation-triangle text-danger"></i>
-                    <small class="text-danger">Alta temperatura</small>
+                  <div class="sensor-value">
+                    <p class="display-6 fw-bold mb-1">28°C</p>
+                    <div class="sensor-trend">
+                      <i class="bi bi-arrow-up text-danger"></i>
+                      <small class="text-danger">+2°C desde ayer</small>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
             <div class="col-6">
-              <div class="card sensor-card normal">
+              <div class="card sensor-card normal" data-sensor="humidity">
                 <div class="card-body">
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-droplet text-primary"></i>
-                    <h6 class="card-title mb-0 fw-semibold">Humedad</h6>
+                  <div class="sensor-header">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <div class="sensor-icon bg-primary">
+                        <i class="bi bi-droplet text-white"></i>
+                      </div>
+                      <div class="sensor-info">
+                        <h6 class="card-title mb-0 fw-semibold">Humedad</h6>
+                        <small class="text-muted">Sensor Principal</small>
+                      </div>
+                    </div>
+                    <div class="sensor-status">
+                      <span class="badge bg-success">Normal</span>
+                    </div>
                   </div>
-                  <p class="display-6 fw-bold mb-1">65%</p>
+                  <div class="sensor-value">
+                    <p class="display-6 fw-bold mb-1">65%</p>
+                    <div class="sensor-trend">
+                      <i class="bi bi-arrow-right text-muted"></i>
+                      <small class="text-muted">Estable</small>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="col-6">
-              <div class="card sensor-card normal">
+              <div class="card sensor-card normal" data-sensor="light">
                 <div class="card-body">
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-sun text-warning"></i>
-                    <h6 class="card-title mb-0 fw-semibold">Luz</h6>
+                  <div class="sensor-header">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <div class="sensor-icon bg-warning">
+                        <i class="bi bi-sun text-white"></i>
+                      </div>
+                      <div class="sensor-info">
+                        <h6 class="card-title mb-0 fw-semibold">Luz</h6>
+                        <small class="text-muted">Sensor Principal</small>
+                      </div>
+                    </div>
+                    <div class="sensor-status">
+                      <span class="badge bg-success">Normal</span>
+                    </div>
                   </div>
-                  <p class="display-6 fw-bold mb-1">75%</p>
+                  <div class="sensor-value">
+                    <p class="display-6 fw-bold mb-1">75%</p>
+                    <div class="sensor-trend">
+                      <i class="bi bi-arrow-up text-success"></i>
+                      <small class="text-success">+5% desde ayer</small>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="col-6">
-              <div class="card sensor-card normal">
+              <div class="card sensor-card normal" data-sensor="irrigation">
                 <div class="card-body">
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-lightning text-success"></i>
-                    <h6 class="card-title mb-0 fw-semibold">Riego</h6>
+                  <div class="sensor-header">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                      <div class="sensor-icon bg-success">
+                        <i class="bi bi-lightning text-white"></i>
+                      </div>
+                      <div class="sensor-info">
+                        <h6 class="card-title mb-0 fw-semibold">Riego</h6>
+                        <small class="text-muted">Sensor Principal</small>
+                      </div>
+                    </div>
+                    <div class="sensor-status">
+                      <span class="badge bg-success">Normal</span>
+                    </div>
                   </div>
-                  <p class="display-6 fw-bold mb-1">40%</p>
+                  <div class="sensor-value">
+                    <p class="display-6 fw-bold mb-1">40%</p>
+                    <div class="sensor-trend">
+                      <i class="bi bi-arrow-down text-warning"></i>
+                      <small class="text-warning">-3% desde ayer</small>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -218,46 +291,64 @@
         <div id="statsTab" class="tab-content d-none">
           <h2 class="h4 fw-bold text-dark mb-4">Estadísticas</h2>
 
+          <!-- Gráfica de Temperatura -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-3">
+                <i class="bi bi-thermometer text-danger me-2"></i>Reporte Semanal - Temperatura
+              </h5>
+              <div class="chart-container">
+                <canvas id="temperatureChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfica de Humedad -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-3">
+                <i class="bi bi-droplet text-primary me-2"></i>Reporte Semanal - Humedad
+              </h5>
+              <div class="chart-container">
+                <canvas id="humidityChart"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumen Diario -->
           <div class="card mb-4">
             <div class="card-body">
               <h5 class="card-title fw-semibold mb-3">Resumen Diario</h5>
               <div class="row g-3">
-                <div class="col-12">
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span class="text-muted">Temperatura Promedio</span>
-                    <span class="fw-semibold">26.5°C</span>
+                <div class="col-6">
+                  <div class="stat-item">
+                    <div class="stat-value">26.5°C</div>
+                    <div class="stat-label">Temp. Promedio</div>
                   </div>
                 </div>
-                <div class="col-12">
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span class="text-muted">Humedad Promedio</span>
-                    <span class="fw-semibold">68%</span>
+                <div class="col-6">
+                  <div class="stat-item">
+                    <div class="stat-value">68%</div>
+                    <div class="stat-label">Humedad Prom.</div>
                   </div>
                 </div>
-                <div class="col-12">
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span class="text-muted">Horas de Luz</span>
-                    <span class="fw-semibold">12h</span>
+                <div class="col-6">
+                  <div class="stat-item">
+                    <div class="stat-value">12h</div>
+                    <div class="stat-label">Horas de Luz</div>
                   </div>
                 </div>
-                <div class="col-12">
-                  <div
-                    class="d-flex justify-content-between align-items-center"
-                  >
-                    <span class="text-muted">Riego Total</span>
-                    <span class="fw-semibold">45L</span>
+                <div class="col-6">
+                  <div class="stat-item">
+                    <div class="stat-value">45L</div>
+                    <div class="stat-label">Riego Total</div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Sensores Activos -->
           <div class="card">
             <div class="card-body">
               <h5 class="card-title fw-semibold mb-3">Sensores Activos</h5>
@@ -288,7 +379,7 @@
         <!-- Alerts Tab -->
         <div id="alertsTab" class="tab-content d-none">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="h4 fw-bold text-dark">Alertas</h2>
+            <h2 class="h4 fw-bold text-dark">Notificaciones</h2>
             <button
               class="btn btn-success rounded-circle"
               data-bs-toggle="modal"
@@ -298,45 +389,109 @@
             </button>
           </div>
 
-          <div class="alert-item alert-unread mb-3">
-            <div class="d-flex align-items-start justify-content-between">
-              <div class="flex-grow-1">
-                <div class="d-flex align-items-center gap-2 mb-1">
-                  <i class="bi bi-thermometer text-danger"></i>
-                  <span class="fw-medium">Temperatura alta: 32°C</span>
+          <!-- Usuarios Conectados -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-3">
+                <i class="bi bi-people text-success me-2"></i>Usuarios Conectados
+              </h5>
+              <div class="row g-2">
+                <div class="col-6">
+                  <div class="user-item clickable-user" data-user="juan">
+                    <div class="user-avatar bg-success">
+                      <i class="bi bi-person-fill text-white"></i>
+                    </div>
+                    <div class="user-info">
+                      <div class="user-name">Juan Pérez</div>
+                      <div class="user-status online">En línea</div>
+                    </div>
+                  </div>
                 </div>
-                <div class="d-flex align-items-center gap-2 text-muted small">
-                  <i class="bi bi-clock"></i>
-                  <span>10:30 AM</span>
+                <div class="col-6">
+                  <div class="user-item clickable-user" data-user="maria">
+                    <div class="user-avatar bg-primary">
+                      <i class="bi bi-person-fill text-white"></i>
+                    </div>
+                    <div class="user-info">
+                      <div class="user-name">María García</div>
+                      <div class="user-status online">En línea</div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="d-flex gap-2 ms-2">
-                <button class="btn btn-sm p-1" title="Marcar como leída">
-                  <i class="bi bi-eye text-muted"></i>
-                </button>
-                <button class="btn btn-sm p-1" title="Eliminar">
-                  <i class="bi bi-trash text-danger"></i>
-                </button>
+                <div class="col-6">
+                  <div class="user-item clickable-user" data-user="carlos">
+                    <div class="user-avatar bg-warning">
+                      <i class="bi bi-person-fill text-white"></i>
+                    </div>
+                    <div class="user-info">
+                      <div class="user-name">Carlos López</div>
+                      <div class="user-status offline">Desconectado</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="user-item clickable-user" data-user="ana">
+                    <div class="user-avatar bg-info">
+                      <i class="bi bi-person-fill text-white"></i>
+                    </div>
+                    <div class="user-info">
+                      <div class="user-name">Ana Martínez</div>
+                      <div class="user-status online">En línea</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="alert-item alert-read mb-3">
-            <div class="d-flex align-items-start justify-content-between">
-              <div class="flex-grow-1">
-                <div class="d-flex align-items-center gap-2 mb-1">
-                  <i class="bi bi-droplet text-primary"></i>
-                  <span class="fw-medium">Humedad baja: 25%</span>
-                </div>
-                <div class="d-flex align-items-center gap-2 text-muted small">
-                  <i class="bi bi-clock"></i>
-                  <span>9:15 AM</span>
+          <!-- Alertas del Sistema -->
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title fw-semibold mb-3">
+                <i class="bi bi-bell text-danger me-2"></i>Alertas del Sistema
+              </h5>
+              
+              <div class="alert-item alert-unread mb-3">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                      <i class="bi bi-thermometer text-danger"></i>
+                      <span class="fw-medium">Temperatura alta: 32°C</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 text-muted small">
+                      <i class="bi bi-clock"></i>
+                      <span>10:30 AM</span>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 ms-2">
+                    <button class="btn btn-sm p-1" title="Marcar como leída">
+                      <i class="bi bi-eye text-muted"></i>
+                    </button>
+                    <button class="btn btn-sm p-1" title="Eliminar">
+                      <i class="bi bi-trash text-danger"></i>
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div class="d-flex gap-2 ms-2">
-                <button class="btn btn-sm p-1" title="Eliminar">
-                  <i class="bi bi-trash text-danger"></i>
-                </button>
+
+              <div class="alert-item alert-read mb-3">
+                <div class="d-flex align-items-start justify-content-between">
+                  <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                      <i class="bi bi-droplet text-primary"></i>
+                      <span class="fw-medium">Humedad baja: 25%</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 text-muted small">
+                      <i class="bi bi-clock"></i>
+                      <span>9:15 AM</span>
+                    </div>
+                  </div>
+                  <div class="d-flex gap-2 ms-2">
+                    <button class="btn btn-sm p-1" title="Eliminar">
+                      <i class="bi bi-trash text-danger"></i>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -398,26 +553,31 @@
 
       <!-- Bottom Navigation -->
       <nav class="nav-bottom">
-        <div class="d-flex justify-content-around align-items-center py-2">
-          <button class="nav-item text-center p-2 active" data-tab="home">
-            <i class="bi bi-house nav-icon"></i>
-            <div class="small">Inicio</div>
+        <div class="nav-container">
+          <button class="nav-item active" data-tab="home">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-house nav-icon"></i>
+            </div>
+            <span class="nav-label">Inicio</span>
           </button>
-          <button class="nav-item text-center p-2" data-tab="stats">
-            <i class="bi bi-bar-chart nav-icon"></i>
-            <div class="small">Estadísticas</div>
+          <button class="nav-item" data-tab="stats">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-bar-chart nav-icon"></i>
+            </div>
+            <span class="nav-label">Estadísticas</span>
           </button>
-          <button
-            class="nav-item text-center p-2 position-relative"
-            data-tab="alerts"
-          >
-            <i class="bi bi-bell nav-icon"></i>
-            <div class="small">Alertas</div>
-            <span class="badge-alert"></span>
+          <button class="nav-item position-relative" data-tab="alerts">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-bell nav-icon"></i>
+              <span class="badge-alert"></span>
+            </div>
+            <span class="nav-label">Notificaciones</span>
           </button>
-          <button class="nav-item text-center p-2" data-tab="settings">
-            <i class="bi bi-gear nav-icon"></i>
-            <div class="small">Ajustes</div>
+          <button class="nav-item" data-tab="settings">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-gear nav-icon"></i>
+            </div>
+            <span class="nav-label">Ajustes</span>
           </button>
         </div>
       </nav>
@@ -428,7 +588,9 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title">Agregar Sensor</h5>
+            <h5 class="modal-title">
+              <i class="bi bi-plus-circle me-2"></i>Agregar Nuevo Sensor
+            </h5>
             <button
               type="button"
               class="btn-close"
@@ -436,27 +598,61 @@
             ></button>
           </div>
           <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label fw-medium">Nombre del Sensor</label>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Ej: Temperatura Zona A"
-              />
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-medium">Tipo de Sensor</label>
-              <select class="form-select">
-                <option>Temperatura</option>
-                <option>Humedad</option>
-                <option>Luz</option>
-                <option>Riego</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label class="form-label fw-medium">Valor Inicial</label>
-              <input type="number" class="form-control" placeholder="0" />
-            </div>
+            <form id="addSensorForm">
+              <div class="mb-3">
+                <label class="form-label fw-medium">Nombre del Sensor</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="sensorName"
+                  placeholder="Ej: Temperatura Zona A"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium">Tipo de Sensor</label>
+                <select class="form-select" id="sensorType" required>
+                  <option value="">Seleccionar tipo...</option>
+                  <option value="temperature">Temperatura</option>
+                  <option value="humidity">Humedad</option>
+                  <option value="light">Luz</option>
+                  <option value="irrigation">Riego</option>
+                  <option value="ph">pH del Suelo</option>
+                  <option value="co2">CO2</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium">Ubicación</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="sensorLocation"
+                  placeholder="Ej: Zona Norte, Sector A"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium">Valor Inicial</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  id="sensorValue"
+                  placeholder="0" 
+                  step="0.1"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-medium">Unidad de Medida</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="sensorUnit"
+                  placeholder="°C, %, lux, etc."
+                  required
+                />
+              </div>
+            </form>
           </div>
           <div class="modal-footer">
             <button
@@ -466,10 +662,133 @@
             >
               Cancelar
             </button>
-            <button type="button" class="btn btn-success">Agregar</button>
+            <button type="button" class="btn btn-success" id="addSensorBtn">
+              <i class="bi bi-plus me-2"></i>Agregar Sensor
+            </button>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-circle me-2"></i>Mi Perfil
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="profile-avatar mx-auto mb-3">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1" id="profileName">Juan Pérez</h6>
+                        <p class="text-muted small mb-0" id="profileRole">Administrador del Proyecto</p>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <div class="info-item">
+                            <i class="bi bi-envelope text-primary"></i>
+                            <div>
+                                <label>Correo Electrónico</label>
+                                <span id="profileEmail">juan.perez@invernadero.com</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-telephone text-success"></i>
+                            <div>
+                                <label>Teléfono</label>
+                                <span id="profilePhone">+52 555 123 4567</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-calendar text-warning"></i>
+                            <div>
+                                <label>Miembro desde</label>
+                                <span id="profileJoinDate">Enero 2024</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="bi bi-shield-check text-info"></i>
+                            <div>
+                                <label>Permisos</label>
+                                <span id="profilePermissions">Control Total</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" id="editProfileBtn">
+                        <i class="bi bi-pencil me-2"></i>Editar Perfil
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Info Modal -->
+    <div class="modal fade" id="userInfoModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person me-2"></i>Información del Usuario
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div class="user-avatar-large mx-auto mb-3" id="userAvatarLarge">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <h6 class="fw-bold mb-1" id="userName">María García</h6>
+                        <p class="text-muted small mb-0" id="userRole">Especialista en Cultivos</p>
+                        <span class="badge bg-success mt-2" id="userStatus">En línea</span>
+                    </div>
+                    
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <i class="bi bi-envelope text-primary"></i>
+                            <div>
+                                <label>Correo</label>
+                                <span id="userEmail">maria.garcia@invernadero.com</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-briefcase text-success"></i>
+                            <div>
+                                <label>Rol en el Proyecto</label>
+                                <span id="userProjectRole">Monitoreo de Cultivos</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-clock text-warning"></i>
+                            <div>
+                                <label>Última Actividad</label>
+                                <span id="userLastActivity">Hace 5 minutos</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="bi bi-geo-alt text-info"></i>
+                            <div>
+                                <label>Ubicación</label>
+                                <span id="userLocation">Zona Norte del Invernadero</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary">
+                        <i class="bi bi-chat me-2"></i>Enviar Mensaje
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Logout Confirmation Modal -->
